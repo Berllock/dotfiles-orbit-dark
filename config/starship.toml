@@ -1,0 +1,82 @@
+add_newline = true
+command_timeout = 1000
+
+format = """
+[╭─](bold #7aa2f7)$os$username$hostname$directory$git_branch$git_status$java$nodejs$golang$python$docker_context$package$cmd_duration
+[╰─](bold #7aa2f7)$character
+"""
+
+[character]
+success_symbol = "[❯](bold #9ece6a)"
+error_symbol = "[❯](bold #f7768e)"
+vimcmd_symbol = "[❮](bold #bb9af7)"
+
+[os]
+disabled = false
+style = "bold #7dcfff"
+format = "[$symbol]($style) "
+
+[os.symbols]
+Fedora = "🚀 "
+Linux = "🚀 "
+
+[username]
+show_always = false
+style_user = "bold #bb9af7"
+format = "[$user]($style) "
+
+[hostname]
+ssh_only = true
+style = "bold #7aa2f7"
+format = "on [$hostname]($style) "
+
+[directory]
+style = "bold #7aa2f7"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " 󰌾"
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+symbol = " "
+style = "bold #bb9af7"
+format = "on [$symbol$branch]($style) "
+
+[git_status]
+style = "bold #f7768e"
+format = "[$all_status$ahead_behind]($style) "
+
+[java]
+symbol = "☕ "
+style = "bold #f7768e"
+format = "via [$symbol$version]($style) "
+
+[nodejs]
+symbol = "⬢ "
+style = "bold #9ece6a"
+format = "via [$symbol$version]($style) "
+
+[golang]
+symbol = " "
+style = "bold #7dcfff"
+format = "via [$symbol$version]($style) "
+
+[python]
+symbol = " "
+style = "bold #e0af68"
+format = "via [$symbol$version]($style) "
+
+[docker_context]
+symbol = " "
+style = "bold #7aa2f7"
+format = "via [$symbol$context]($style) "
+
+[package]
+symbol = "󰏗 "
+style = "bold #bb9af7"
+format = "is [$symbol$version]($style) "
+
+[cmd_duration]
+min_time = 1000
+style = "bold #e0af68"
+format = "took [$duration]($style) "
