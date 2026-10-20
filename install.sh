@@ -1,25 +1,33 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-echo "Creating config directories..."
+DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+BACKUP_DIR="$(mktemp -d "$HOME/.orbit-dark-backup.XXXXXXXX")"
 
-mkdir -p ~/.config/kitty
-mkdir -p ~/.config/fastfetch
+echo "Backing up current files to $BACKUP_DIR..."
 
-echo "Backing up current files..."
+backup() {
+    local source="$1" name="$2"
+    if [[ -e "$source" || -L "$source" ]]; then
+        cp -a -- "$source" "$BACKUP_DIR/$name"
+    fi
+}
 
-[ -f ~/.zshrc ] && cp ~/.zshrc ~/.zshrc.bak
-[ -f ~/.config/starship.toml ] && cp ~/.config/starship.toml ~/.config/starship.toml.bak
-[ -d ~/.config/kitty ] && cp -r ~/.config/kitty ~/.config/kitty.bak
-[ -d ~/.config/fastfetch ] && cp -r ~/.config/fastfetch ~/.config/fastfetch.bak
+backup "$HOME/.zshrc" zshrc
+backup "$CONFIG_DIR/starship.toml" starship.toml
+backup "$CONFIG_DIR/kitty" kitty
+backup "$CONFIG_DIR/fastfetch" fastfetch
 
 echo "Installing dotfiles..."
 
-cp .zshrc ~/.zshrc
-cp config/starship.toml ~/.config/starship.toml
-cp -r config/kitty/* ~/.config/kitty/ 2>/dev/null || true
-cp -r config/fastfetch/* ~/.config/fastfetch/ 2>/dev/null || true
+mkdir -p -- "$CONFIG_DIR/kitty" "$CONFIG_DIR/fastfetch"
+cp -- "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
+cp -- "$DOTFILES_DIR/config/starship.toml" "$CONFIG_DIR/starship.toml"
+cp -R -- "$DOTFILES_DIR/config/kitty/." "$CONFIG_DIR/kitty/"
+cp -R -- "$DOTFILES_DIR/config/fastfetch/." "$CONFIG_DIR/fastfetch/"
 
 echo "Done."
-echo "Restart your terminal or run: source ~/.zshrc"
+echo "Backups: $BACKUP_DIR"
+echo "Open a new Zsh terminal or, from Zsh, run: source ~/.zshrc"

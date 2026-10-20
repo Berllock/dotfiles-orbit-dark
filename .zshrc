@@ -8,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME=""
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -72,7 +72,9 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+    source "$ZSH/oh-my-zsh.sh"
+fi
 
 # User configuration
 
@@ -102,28 +104,30 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-# Source global definitions (equivalente ao /etc/bashrc)
-if [ -f /etc/zshrc ]; then
-    . /etc/zshrc
-fi
+# Fedora already loads /etc/zshrc before the user's .zshrc.
+# Keep PATH entries unique, including when reloading this file.
+typeset -U path PATH
+export ASDF_DATA_DIR="${ASDF_DATA_DIR:-$HOME/.asdf}"
+path=("$ASDF_DATA_DIR/shims" "$HOME/.local/bin" "$HOME/bin" $path)
+export PATH
 
-# PATH
-if [[ ":$PATH:" != *":$HOME/.local/bin:$HOME/bin:"* ]]; then
-    export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+# asdf >= 0.16 uses a standalone binary, without asdf.sh.
+# Load NVM after asdf so the selected Node version takes precedence.
+export NVM_DIR="$HOME/.nvm"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    source "$NVM_DIR/nvm.sh"
 fi
-
-# asdf
-. "$HOME/.asdf/asdf.sh"
+if [[ -s "$NVM_DIR/bash_completion" ]]; then
+    source "$NVM_DIR/bash_completion"
+fi
 
 alias dc="docker compose"
 alias dcu="docker compose up"
 alias dcd="docker compose down"
 
-eval "$(starship init zsh)"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
 
 # ===== Orbit Dev Aliases =====
 alias ls='eza --icons'
@@ -136,4 +140,6 @@ alias grep='rg'
 alias top='btop'
 alias ff='fastfetch'
 
-eval "$(zoxide init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
